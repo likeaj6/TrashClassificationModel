@@ -10,7 +10,7 @@ slim = tf.contrib.slim
 
 #================ DATASET INFORMATION ======================
 #State dataset directory where the tfrecord files are located
-dataset_dir = './dataset'
+dataset_dir = '../data'
 
 #State where your log file is at. If it doesn't exist, create it.
 log_dir = './log'
@@ -19,10 +19,10 @@ log_dir = './log'
 image_size = 299
 
 #State the number of classes to predict:
-num_classes = 5
+num_classes = 6
 
 #State the labels file and read it
-labels_file = './dataset/labels.txt'
+labels_file = '../data/labels.txt'
 labels = open(labels_file, 'r')
 
 #Create a dictionary to refer each label to their string name
@@ -33,12 +33,12 @@ for line in labels:
     labels_to_name[int(label)] = string_name
 
 #Create the file pattern of your TFRecord files so that it could be recognized later on
-file_pattern = 'flowers_%s_*.tfrecord'
+file_pattern = 'trash_data_%s_*.tfrecord'
 
 #Create a dictionary that will help people understand your dataset better. This is required by the Dataset class later.
 items_to_descriptions = {
-    'image': 'A 3-channel RGB coloured flower image that is either tulips, sunflowers, roses, dandelion, or daisy.',
-    'label': 'A label that is as such -- 0:daisy, 1:dandelion, 2:roses, 3:sunflowers, 4:tulips'
+    'image': 'A 3-channel RGB coloured trash image that is either GLASS, PAPER, CARDBOARD, PLASTIC, METAL, or TRASH',
+    'label': 'A label that is as such -- 0:GLASS, 1:PAPER, 2:CARDBOARD, 3:PLASTIC, 4:METAL, 5:TRASH'
 }
 
 
