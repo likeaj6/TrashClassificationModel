@@ -10,7 +10,7 @@ slim = tf.contrib.slim
 
 #================ DATASET INFORMATION ======================
 #State dataset directory where the tfrecord files are located
-dataset_dir = '../data'
+dataset_dir = './data'
 
 #State where your log file is at. If it doesn't exist, create it.
 log_dir = './log'
@@ -22,7 +22,7 @@ image_size = 299
 num_classes = 6
 
 #State the labels file and read it
-labels_file = '../data/labels.txt'
+labels_file = './data/labels.txt'
 labels = open(labels_file, 'r')
 
 #Create a dictionary to refer each label to their string name
@@ -44,10 +44,10 @@ items_to_descriptions = {
 
 #================= TRAINING INFORMATION ==================
 #State the number of epochs to train
-num_epochs = 64
+num_epochs = 1000
 
 #State your batch size
-batch_size = 10
+batch_size = 500
 
 #Learning rate information and configuration (Up to you to experiment)
 initial_learning_rate = 0.001
@@ -78,7 +78,7 @@ def get_split(split_name, dataset_dir, file_pattern=file_pattern):
 
     #Count the total number of examples in all of these shard
     num_samples = 0
-    file_pattern_for_counting = 'flowers_' + split_name
+    file_pattern_for_counting = 'trash_data_' + split_name
     tfrecords_to_count = [os.path.join(dataset_dir, file) for file in os.listdir(dataset_dir) if file.startswith(file_pattern_for_counting)]
     for tfrecord_file in tfrecords_to_count:
         for record in tf.python_io.tf_record_iterator(tfrecord_file):
@@ -171,7 +171,10 @@ def run():
 
         #First create the dataset and load one batch
         dataset = get_split('train', dataset_dir, file_pattern=file_pattern)
+        print('DATASET: ', dataset)
         images, _, labels = load_batch(dataset, batch_size=batch_size)
+        print('images: ', images)
+        print('labels: ', labels)
 
         #Know the number steps to take before decaying the learning rate and batches per epoch
         num_batches_per_epoch = dataset.num_samples // batch_size
