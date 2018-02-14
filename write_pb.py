@@ -6,7 +6,7 @@ slim = tf.contrib.slim
 
 def run():
     image_size = 299
-    num_classes = 5
+    num_classes = 6
     logdir = './log'
 
     checkpoint_file = tf.train.latest_checkpoint(logdir)
