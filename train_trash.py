@@ -47,11 +47,11 @@ items_to_descriptions = {
 num_epochs = 1000
 
 #State your batch size
-batch_size = 500
+batch_size = 50
 
 #Learning rate information and configuration (Up to you to experiment)
-initial_learning_rate = 0.001
-learning_rate_decay_factor = 0.1
+initial_learning_rate = 0.045
+learning_rate_decay_factor = 0.94
 num_epochs_before_decay = 2
 
 #============== DATASET LOADING ======================
@@ -254,6 +254,7 @@ def run():
 
                     # optionally, print your logits and predictions for a sanity check that things are going fine.
                     logits_value, probabilities_value, predictions_value, labels_value = sess.run([logits, probabilities, predictions, labels])
+                    
                     print('logits: \n', logits_value[:5])
                     print('Probabilities: \n', probabilities_value[:5])
                     print('predictions: \n', predictions_value[:5])
@@ -262,6 +263,9 @@ def run():
                 #Log the summaries every 10 step.
                 if step % 10 == 0:
                     loss, _ = train_step(sess, train_op, sv.global_step)
+                    learning_rate_value, accuracy_value = sess.run([lr, accuracy])
+                    logging.info('Current Learning Rate: %s', learning_rate_value)
+                    logging.info('Current Streaming Accuracy: %s', accuracy_value)
                     summaries = sess.run(my_summary_op)
                     sv.summary_computed(sess, summaries)
 
