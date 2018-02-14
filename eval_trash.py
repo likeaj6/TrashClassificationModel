@@ -22,9 +22,12 @@ log_eval = './log_eval_test'
 dataset_dir = './data'
 
 #State the batch_size to evaluate each time, which can be a lot more than the training batch
-batch_size = 50
+batch_size = 500
 #State the number of epochs to evaluate
+
 num_epochs = 3
+
+num_classes = 6
 
 #Get the latest checkpoint file
 checkpoint_file = tf.train.latest_checkpoint(log_dir)
@@ -85,7 +88,7 @@ def run():
 
         ''' confusion matrix summaries '''
         with tf.name_scope('confusion_matrix'):
-			confusion_matrix = tf.as_string(tf.confusion_matrix(labels=labels, predictions=predictions, num_classes=num_classes, name='Confusion'))
+            confusion_matrix = tf.as_string(tf.confusion_matrix(labels=labels, predictions=predictions, num_classes=num_classes, name='Confusion'))
 
 
 
@@ -100,7 +103,7 @@ def run():
 
         #Now we are ready to run in one session
         with sv.managed_session() as sess:
-            for step in xrange(int(num_batches_per_epoch * num_epochs)):
+            for step in range(int(num_batches_per_epoch * num_epochs)):
                 #print vital information every start of the epoch as always
                 if step % num_batches_per_epoch == 0:
                     logging.info('Epoch: %s/%s', step / num_batches_per_epoch + 1, num_epochs)
