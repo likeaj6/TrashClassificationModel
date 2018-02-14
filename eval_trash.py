@@ -19,7 +19,7 @@ log_dir = './log'
 log_eval = './log_eval_test'
 
 #State the dataset directory where the validation set is found
-dataset_dir = './dataset'
+dataset_dir = './data'
 
 #State the batch_size to evaluate each time, which can be a lot more than the training batch
 batch_size = 50
