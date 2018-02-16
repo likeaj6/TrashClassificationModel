@@ -3,12 +3,10 @@ import sys
 import glob
 import argparse
 import matplotlib.pyplot as plt
-import shutil
-
-import numpy as np
 
 from keras import __version__
-from keras.applications.inception_v3 import InceptionV3, preprocess_input
+
+from keras.applications.inception_resnet_v2 import InceptionResNetV2, preprocess_input
 from keras.models import Model
 from keras.layers import Dense, GlobalAveragePooling2D
 from keras.preprocessing.image import ImageDataGenerator
@@ -16,11 +14,11 @@ from keras.optimizers import SGD
 
 
 IMAGE_WIDTH, IMAGE_HEIGHT = 299, 299 #fixed size for InceptionV3
-NB_EPOCHS = 20
-BAT_SIZE = 50
+NB_EPOCHS = 3
+BAT_SIZE = 32
 FC_SIZE = 1024
 NB_IV3_LAYERS_TO_FREEZE = 172
-ALL_DATA_FILEPATH = './data/dataset-original/'
+ALL_DATA_FILEPATH = './data'
 TRAINING_DATA_FILEPATH = './data/training/'
 VALIDATION_DATA_FILEPATH = './data/validation/'
 VALIDATION_SPLIT = 0.25
@@ -87,8 +85,8 @@ def get_nb_files(directory):
 def setup_to_transfer_learn(model, base_model):
     """Freeze all layers and compile the model"""
     for layer in base_model.layers:
-        layer.trainable = False
-        model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+    layer.trainable = False
+    model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
 
 
 def add_new_last_layer(base_model, nb_classes):
@@ -122,14 +120,13 @@ def setup_to_finetune(model):
 
 def train(args):
     """Use transfer learning and fine-tuning to train a network on a new dataset"""
-    nb_train_samples = get_nb_files(TRAINING_DATA_FILEPATH)
-    nb_classes = len(glob.glob(TRAINING_DATA_FILEPATH + "/*"))
-    nb_val_samples = get_nb_files(VALIDATION_DATA_FILEPATH)
+    nb_train_samples = get_nb_files(args.train_dir)
+    nb_classes = len(glob.glob(args.train_dir + "/*"))
+    nb_val_samples = get_nb_files(args.val_dir)
     nb_epoch = int(args.nb_epoch)
     batch_size = int(args.batch_size)
 
-    # split_dataset_into_test_and_train_sets(ALL_DATA_FILEPATH, TRAINING_DATA_FILEPATH, VALIDATION_DATA_FILEPATH, VALIDATION_SPLIT)
-
+    split_dataset_into_test_and_train_sets(DATASET_FILEPATH, TRAINING_DATA_FILEPATH, VALIDATION_DATA_FILEPATH, VALIDATION_SPLIT)
 
     # data prep
     train_datagen =  ImageDataGenerator(
@@ -152,19 +149,19 @@ def train(args):
     )
 
     train_generator = train_datagen.flow_from_directory(
-    TRAINING_DATA_FILEPATH,
+    args.train_dir,
     target_size=(IMAGE_WIDTH, IMAGE_HEIGHT),
     batch_size=batch_size,
     )
 
     validation_generator = test_datagen.flow_from_directory(
-    VALIDATION_DATA_FILEPATH,
+    args.val_dir,
     target_size=(IMAGE_WIDTH, IMAGE_HEIGHT),
     batch_size=batch_size,
     )
 
     # setup model
-    base_model = InceptionV3(weights='imagenet', include_top=False) #include_top=False excludes final FC layer
+    base_model = InceptionResNetV2(include_top=False, weights='imagenet') #include_top=False excludes final FC layer
     model = add_new_last_layer(base_model, nb_classes)
 
     # transfer learning
@@ -175,9 +172,8 @@ def train(args):
     nb_epoch=nb_epoch,
     samples_per_epoch=nb_train_samples,
     validation_data=validation_generator,
-    validation_steps=nb_val_samples/BAT_SIZE,
-    class_weight='auto',
-    verbose=1)
+    nb_val_samples=nb_val_samples,
+    class_weight='auto')
 
     # fine-tuning
     # setup_to_finetune(model)
@@ -192,8 +188,8 @@ def train(args):
 
     model.save(args.output_model_file)
 
-    #if args.plot:
-    #    plot_training(history_tl)
+    if args.plot:
+        plot_training(history_tl)
 
 
 def plot_training(history):
@@ -224,5 +220,12 @@ if __name__=="__main__":
     a.add_argument("--plot", action="store_true")
 
     args = a.parse_args()
+    if args.train_dir is None or args.val_dir is None:
+        a.print_help()
+        sys.exit(1)
+
+    if (not os.path.exists(args.train_dir)) or (not os.path.exists(args.val_dir)):
+        print("directories do not exist")
+        sys.exit(1)
 
     train(args)
