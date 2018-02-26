@@ -254,7 +254,11 @@ def run():
 
                     # optionally, print your logits and predictions for a sanity check that things are going fine.
                     logits_value, probabilities_value, predictions_value, labels_value = sess.run([logits, probabilities, predictions, labels])
-                    
+                    logging.info('logits: \n%s', logits_value[:10])
+                    logging.info('Probabilities: \n%s', probabilities_value[:10])
+                    logging.info('predictions: \n%s', predictions_value[:10])
+                    logging.info('Labels:\n: %s', labels_value[:10])
+
                     print('logits: \n', logits_value[:5])
                     print('Probabilities: \n', probabilities_value[:5])
                     print('predictions: \n', predictions_value[:5])

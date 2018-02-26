@@ -7,6 +7,12 @@ import matplotlib.pyplot as plt
 from keras import __version__
 
 from keras.applications.inception_resnet_v2 import InceptionResNetV2, preprocess_input
+from keras.models import Model
+from keras.layers import Dense, GlobalAveragePooling2D
+from keras.preprocessing.image import ImageDataGenerator
+from keras.optimizers import SGD
+
+
 import os
 import sys
 import glob
@@ -18,7 +24,7 @@ import numpy as np
 
 
 IMAGE_WIDTH, IMAGE_HEIGHT = 299, 299 #fixed size for InceptionV3
-NB_EPOCHS = 20
+NB_EPOCHS = 50
 BAT_SIZE = 50
 FC_SIZE = 1024
 NB_IV3_LAYERS_TO_FREEZE = 172
