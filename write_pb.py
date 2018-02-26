@@ -12,15 +12,17 @@ def run():
     checkpoint_file = tf.train.latest_checkpoint(logdir)
 
     with tf.Graph().as_default() as graph:
-
+        print('getting here')
         images = tf.placeholder(shape=[None, image_size, image_size, 3], dtype=tf.float32, name = 'Placeholder_only')
 
         with slim.arg_scope(xception_arg_scope()):
             logits, end_points = xception(images, num_classes = num_classes, is_training = False)
-
+        
+        print('loaded model')
         variables_to_restore = slim.get_variables_to_restore()
         saver = tf.train.Saver(variables_to_restore)
-
+        
+        print('loaded weights')
         #Setup graph def
         input_graph_def = graph.as_graph_def()
         output_node_names = "Xception/Predictions/Softmax"
@@ -38,6 +40,5 @@ def run():
 
             with tf.gfile.GFile(output_graph_name, "wb") as f:
                 f.write(output_graph_def.SerializeToString())
-
-if __name__=='_main__':
-    run()
+                
+run()
